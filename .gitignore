@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+venv/
+env/
+ENV/
+.env
+
+# Database
+*.db
+*.sqlite
+backend/*.db
+backend/*.sqlite
+
+# Testing & IDE
+.pytest_cache/
+.vscode/
+.idea/
+*.log
+# Additional environment folders
+.venv/
+backend/.venv/
+
+# Other generated files
+.DS_Store
+node_modules/

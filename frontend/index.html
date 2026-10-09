@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizGen AI — Automatic Quiz Generator & Assessment Agent</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="brand" onclick="app.navigateTo('home')">
+                <i class="fa-solid me-2 fa-brain-circuit brand-icon"></i>
+                <span>QuizGen <strong class="text-violet">AI</strong></span>
+                <span class="badge-tag">Human-in-the-Loop</span>
+            </div>
+            
+            <nav class="nav-links" id="nav-menu">
+                <!-- Dynamic Nav Items Rendered by JS -->
+            </nav>
+
+            <div class="nav-auth" id="nav-user-area">
+                <button class="btn btn-outline" onclick="app.showAuthModal('login')"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+                <button class="btn btn-primary" onclick="app.showAuthModal('register')"><i class="fa-solid fa-user-plus"></i> Register</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+        <!-- Notification Toast Container -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- 1. HOME VIEW -->
+        <section id="view-home" class="view-section active">
+            <div class="hero">
+                <div class="hero-content">
+                    <span class="pill-badge"><i class="fa-solid fa-sparkles"></i> Autonomous Multi-Agent Quiz Infrastructure</span>
+                    <h1>AI-Powered Quiz Generation with <span class="gradient-text">Human-in-the-Loop</span> Control</h1>
+                    <p>Empower faculty to automatically generate high-quality quizzes, audit question accuracy with dedicated AI agents, enforce human approval before publication, and deliver instant personalized weak-area analysis to students.</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary btn-lg" onclick="app.handleHeroGetStarted()"><i class="fa-solid fa-rocket"></i> Get Started Free</button>
+                        <button class="btn btn-secondary btn-lg" onclick="app.showArchitectureModal()"><i class="fa-solid fa-network-wired"></i> View Agent Architecture</button>
+                    </div>
+                </div>
+                <div class="hero-card">
+                    <div class="agent-pipeline-preview">
+                        <h3><i class="fa-solid fa-diagram-project"></i> 7-Agent System Pipeline</h3>
+                        <div class="pipeline-step active">
+                            <span class="step-num">1</span>
+                            <div><strong>Quiz Generator Agent</strong><small>Crafts question stems & distractors</small></div>
+                        </div>
+                        <div class="pipeline-step active">
+                            <span class="step-num">2</span>
+                            <div><strong>Answer Key Agent</strong><small>Generates canonical keys & explanations</small></div>
+                        </div>
+                        <div class="pipeline-step active">
+                            <span class="step-num">3</span>
+                            <div><strong>Quality Checker Agent</strong><small>Audits clarity, difficulty & flags items</small></div>
+                        </div>
+                        <div class="pipeline-step highlight">
+                            <span class="step-num"><i class="fa-solid fa-user-shield"></i></span>
+                            <div><strong>Human Approval Agent</strong><small>Faculty review & publishing gatekeeper</small></div>
+                        </div>
+                        <div class="pipeline-step active">
+                            <span class="step-num">5</span>
+                            <div><strong>Evaluation & Weak Area Agents</strong><small>Auto-grading & remedial learning plans</small></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. FACULTY DASHBOARD VIEW -->
+        <section id="view-faculty-dashboard" class="view-section">
+            <div class="dashboard-header">
+                <div>
+                    <h2>Faculty Assessment Portal</h2>
+                    <p>Manage AI quiz generation, review quality flags, approve questions, and view student progress analytics.</p>
+                </div>
+                <button class="btn btn-primary" onclick="app.navigateTo('create-quiz')"><i class="fa-solid fa-plus"></i> Create New AI Quiz</button>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="stats-grid" id="faculty-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-violet"><i class="fa-solid fa-folder-open"></i></div>
+                    <div>
+                        <span class="stat-value" id="stat-total-quizzes">0</span>
+                        <span class="stat-label">Total Quizzes Created</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-amber"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    <div>
+                        <span class="stat-value" id="stat-pending-approvals">0</span>
+                        <span class="stat-label">Pending Approvals</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-emerald"><i class="fa-solid fa-circle-check"></i></div>
+                    <div>
+                        <span class="stat-value" id="stat-published-quizzes">0</span>
+                        <span class="stat-label">Published Quizzes</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue"><i class="fa-solid fa-users"></i></div>
+                    <div>
+                        <span class="stat-value" id="stat-total-submissions">0</span>
+                        <span class="stat-label">Student Submissions</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-sections">
+                <!-- Quizzes Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-list-check"></i> Created Quizzes & Approval Status</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Title & Topic</th>
+                                    <th>Difficulty</th>
+                                    <th>Questions</th>
+                                    <th>Status</th>
+                                    <th>Created Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="faculty-quiz-table-body">
+                                <tr><td colspan="6" class="text-center">Loading quizzes...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Weak Area Reports Needing Approval -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-user-check"></i> Student Weak-Area Reports Needing Approval</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Quiz Title</th>
+                                    <th>Score</th>
+                                    <th>Weak Topics Detected</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="faculty-reports-table-body">
+                                <tr><td colspan="6" class="text-center">Loading student reports...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. CREATE QUIZ FORM VIEW -->
+        <section id="view-create-quiz" class="view-section">
+            <div class="card max-w-700 mx-auto">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-wand-magic-sparkles text-violet"></i> AI Multi-Agent Quiz Generator</h2>
+                    <p>Configure parameters. The 7-Agent system will generate stems, attach answer keys, and audit quality.</p>
+                </div>
+                <form id="form-create-quiz" onsubmit="app.handleCreateQuiz(event)">
+                    <div class="form-group">
+                        <label for="quiz-title">Quiz Title</label>
+                        <input type="text" id="quiz-title" placeholder="e.g. Midterm 1: Computer Science Fundamentals" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quiz-topic">Target Topic / Subject</label>
+                        <input type="text" id="quiz-topic" placeholder="e.g. Python Data Structures & Object-Oriented Programming" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quiz-difficulty">Difficulty Level</label>
+                            <select id="quiz-difficulty">
+                                <option value="Easy">Easy (Foundational)</option>
+                                <option value="Medium" selected>Medium (Intermediate)</option>
+                                <option value="Hard">Hard (Advanced Application)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quiz-count">Number of Questions</label>
+                            <input type="number" id="quiz-count" min="1" max="15" value="5" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Included Question Types</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" id="qt-mcq" checked> Multiple Choice (MCQ)</label>
+                            <label class="checkbox-label"><input type="checkbox" id="qt-tf" checked> True / False</label>
+                            <label class="checkbox-label"><input type="checkbox" id="qt-short" checked> Short Answer</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-generate-submit">
+                        <i class="fa-solid fa-robot"></i> Trigger AI Agent Pipeline
+                    </button>
+                </form>
+
+                <!-- Agent Generation Progress Stepper Modal/Banner -->
+                <div id="agent-stepper" class="agent-stepper hidden mt-4">
+                    <h4><i class="fa-solid fa-spinner fa-spin text-violet"></i> Multi-Agent Generation In Progress...</h4>
+                    <div class="stepper-track">
+                        <div class="step-item" id="stepper-step-1">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i> Step 1: Generator Agent crafting question stems
+                        </div>
+                        <div class="step-item" id="stepper-step-2">
+                            <i class="fa-solid fa-clock"></i> Step 2: Answer Key Agent generating canonical solutions & explanations
+                        </div>
+                        <div class="step-item" id="stepper-step-3">
+                            <i class="fa-solid fa-clock"></i> Step 3: Quality Checker Agent auditing clarity & difficulty flags
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. QUIZ PREVIEW & HUMAN APPROVAL VIEW -->
+        <section id="view-quiz-approval" class="view-section">
+            <div class="approval-header card mb-4">
+                <div class="flex-between">
+                    <div>
+                        <span class="pill-badge pill-amber" id="preview-quiz-status">Pending Faculty Approval</span>
+                        <h2 id="preview-quiz-title">Quiz Title</h2>
+                        <p id="preview-quiz-meta">Topic: ... | Difficulty: ... | Questions: 0</p>
+                    </div>
+                    <div class="approval-actions">
+                        <button class="btn btn-secondary" onclick="app.handleApproveEntireQuiz()"><i class="fa-solid fa-thumbs-up"></i> Approve All Questions</button>
+                        <button class="btn btn-success btn-lg" id="btn-publish-quiz" onclick="app.handlePublishQuiz()"><i class="fa-solid fa-paper-plane"></i> Approve & Publish Quiz</button>
+                    </div>
+                </div>
+                <div class="alert alert-info mt-3" id="human-in-the-loop-banner">
+                    <i class="fa-solid fa-shield-halved"></i> <strong>Human-in-the-Loop Requirement:</strong> Unapproved quizzes cannot be published. Faculty must review quality auditor scores, edit flagged items, and grant explicit approval.
+                </div>
+            </div>
+
+            <!-- Question Cards List -->
+            <div id="approval-questions-container" class="questions-list">
+                <!-- Rendered by JS -->
+            </div>
+        </section>
+
+        <!-- 5. STUDENT DASHBOARD VIEW -->
+        <section id="view-student-dashboard" class="view-section">
+            <div class="dashboard-header">
+                <div>
+                    <h2>Student Learning Hub</h2>
+                    <p>Take available published quizzes, view graded submissions, and review AI weak-area remedial recommendations.</p>
+                </div>
+            </div>
+
+            <div class="dashboard-sections">
+                <!-- Available Published Quizzes -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-book-open text-violet"></i> Available Quizzes to Attempt</h3>
+                    </div>
+                    <div class="grid-cards" id="student-published-grid">
+                        <div class="text-center p-4">Loading published quizzes...</div>
+                    </div>
+                </div>
+
+                <!-- My Submissions & Weak Area Reports -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-chart-line text-emerald"></i> My Quiz Performance & Weak-Area Reports</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Quiz Title & Topic</th>
+                                    <th>Score</th>
+                                    <th>Percentage</th>
+                                    <th>Faculty Report Approval</th>
+                                    <th>Attempted Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-submissions-table-body">
+                                <tr><td colspan="6" class="text-center">Loading quiz history...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. STUDENT QUIZ-TAKING VIEW -->
+        <section id="view-take-quiz" class="view-section">
+            <div class="card max-w-800 mx-auto">
+                <div class="flex-between card-header">
+                    <div>
+                        <h2 id="take-quiz-title">Taking Quiz...</h2>
+                        <p id="take-quiz-topic">Topic: ...</p>
+                    </div>
+                    <div class="timer-box">
+                        <i class="fa-solid fa-stopwatch text-amber"></i> Time Elapsed: <span id="quiz-timer">00:00</span>
+                    </div>
+                </div>
+
+                <form id="form-take-quiz" onsubmit="app.handleStudentQuizSubmit(event)">
+                    <div id="take-questions-container" class="take-questions-list">
+                        <!-- Questions rendered by JS -->
+                    </div>
+
+                    <div class="quiz-submit-bar flex-between mt-4">
+                        <button type="button" class="btn btn-secondary" onclick="app.navigateTo('student-dashboard')">Cancel</button>
+                        <button type="submit" class="btn btn-primary btn-lg"><i class="fa-solid fa-circle-check"></i> Submit Quiz Answers</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- 7. RESULTS & WEAK-AREA REPORT VIEW -->
+        <section id="view-results-report" class="view-section">
+            <div class="card max-w-900 mx-auto">
+                <div class="results-header text-center">
+                    <span class="pill-badge pill-emerald"><i class="fa-solid fa-square-poll-vertical"></i> Assessment Complete</span>
+                    <h2 id="result-quiz-title">Results & Detailed Report</h2>
+                    
+                    <div class="score-banner mt-3">
+                        <div class="score-circle">
+                            <span class="score-pct" id="result-score-pct">0%</span>
+                            <span class="score-sub" id="result-score-raw">0 / 0 pts</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weak Area Analysis Card -->
+                <div class="weak-area-card mt-4">
+                    <h3><i class="fa-solid fa-microscope text-violet"></i> AI Weak-Area Analysis & Remedial Action Plan</h3>
+                    <div id="weak-area-content" class="mt-3">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Question Breakdown -->
+                <div class="mt-4">
+                    <h3><i class="fa-solid fa-list-ol"></i> Itemized Response Breakdown</h3>
+                    <div id="result-breakdown-container" class="mt-3">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button class="btn btn-primary" onclick="app.navigateToDashboard()"><i class="fa-solid fa-arrow-left"></i> Return to Dashboard</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <button class="modal-close" onclick="app.closeAuthModal()">&times;</button>
+            <div id="auth-form-container">
+                <!-- Rendered dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Question Modal -->
+    <div id="edit-question-modal" class="modal-overlay hidden">
+        <div class="modal-card max-w-600">
+            <button class="modal-close" onclick="app.closeEditQuestionModal()">&times;</button>
+            <h3><i class="fa-solid fa-pen-to-square text-violet"></i> Faculty Question Editor</h3>
+            <form id="form-edit-question" onsubmit="app.handleSaveEditedQuestion(event)" class="mt-3">
+                <input type="hidden" id="edit-q-id">
+                <div class="form-group">
+                    <label for="edit-q-text">Question Prompt</label>
+                    <textarea id="edit-q-text" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group" id="edit-q-options-container">
+                    <label>Options (for MCQ)</label>
+                    <input type="text" class="edit-opt-input mb-2" placeholder="Option A">
+                    <input type="text" class="edit-opt-input mb-2" placeholder="Option B">
+                    <input type="text" class="edit-opt-input mb-2" placeholder="Option C">
+                    <input type="text" class="edit-opt-input mb-2" placeholder="Option D">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-q-correct">Correct Answer</label>
+                    <input type="text" id="edit-q-correct" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-q-explanation">Step-by-Step Explanation</label>
+                    <textarea id="edit-q-explanation" rows="2" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-q-subtopic">Subtopic Tag</label>
+                    <input type="text" id="edit-q-subtopic" required>
+                </div>
+
+                <div class="flex-end gap-2 mt-3">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeEditQuestionModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save Faculty Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Agent Architecture Modal -->
+    <div id="arch-modal" class="modal-overlay hidden">
+        <div class="modal-card max-w-700">
+            <button class="modal-close" onclick="app.closeArchitectureModal()">&times;</button>
+            <h3><i class="fa-solid fa-network-wired text-violet"></i> 7-Agent System Architecture</h3>
+            <div class="arch-body mt-3">
+                <div class="arch-item">
+                    <h4>1. Quiz Generator Agent</h4>
+                    <p>Generates high-quality question stems and options using Gemini AI prompt templates.</p>
+                </div>
+                <div class="arch-item">
+                    <h4>2. Answer Key Agent</h4>
+                    <p>Determines canonical correct answers, detailed explanations, and point values.</p>
+                </div>
+                <div class="arch-item">
+                    <h4>3. Quality Checker Agent</h4>
+                    <p>Audits clarity, checks distractor quality, difficulty match, and flags ambiguous questions.</p>
+                </div>
+                <div class="arch-item highlight-arch">
+                    <h4>4. Human Approval Agent</h4>
+                    <p>Enforces human-in-the-loop review. Blocks unapproved quizzes from being published.</p>
+                </div>
+                <div class="arch-item">
+                    <h4>5. Evaluation Agent</h4>
+                    <p>Auto-evaluates student responses against key rubrics (exact match & semantic scoring).</p>
+                </div>
+                <div class="arch-item">
+                    <h4>6. Weak Area Analyzer Agent</h4>
+                    <p>Detects student concept gaps (<70% accuracy) and formulates personalized study plans.</p>
+                </div>
+                <div class="arch-item">
+                    <h4>7. Central Agent Orchestrator</h4>
+                    <p>Sequences multi-agent pipelines and handles graceful fallback to Smart Demo Mode if needed.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
